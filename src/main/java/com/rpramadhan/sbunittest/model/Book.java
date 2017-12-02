@@ -20,6 +20,10 @@ public class Book implements Serializable {
 		return book;
 	}
 	
+	public static Book createInstance(String title, String author) {
+		return Book.createInstance(null, title, author);
+	}
+	
 	@JsonProperty("id")
 	private Long id;
 	

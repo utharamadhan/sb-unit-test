@@ -27,11 +27,12 @@ public class BookController {
 			resp.setResponseCode("00");
 			resp.setResponseDesc("success");
 			resp.setResult(book);
+			return ResponseEntity.accepted().body(resp);
 		} else {
 			resp.setResponseCode("04");
 			resp.setResponseDesc("not found");
+			return ResponseEntity.badRequest().body(resp);
 		}
-		return ResponseEntity.accepted().body(resp);
 	}
 	
 	@RequestMapping(value = "/", method=RequestMethod.POST)
@@ -43,34 +44,51 @@ public class BookController {
 			resp.setResponseCode("00");
 			resp.setResponseDesc("success");
 			resp.setResult(book);
+			return ResponseEntity.accepted().body(resp);
+		} catch (IllegalArgumentException argEx){
+			resp.setResponseCode("10");
+			resp.setResponseDesc(argEx.getMessage());
 		} catch (Exception ex) {
 			resp.setResponseCode("04");
 			resp.setResponseDesc(ex.getMessage());
 		}
-		return ResponseEntity.accepted().body(resp);
+		return ResponseEntity.badRequest().body(resp);
 	}
 	
 	@RequestMapping(value = "/{id}", method=RequestMethod.PUT)
 	public ResponseEntity<Response> put(@PathVariable("id") Long id, @RequestBody Book book) {
 		Response resp = new Response();
 		try {
-			validateBook(book);
+			validateEditBook(id, book);
 			service.saveOrUpdate(book);
 			resp.setResponseCode("00");
 			resp.setResponseDesc("success");
 			resp.setResult(book);
+			return ResponseEntity.accepted().body(resp);
+		} catch (IllegalArgumentException argEx){
+			resp.setResponseCode("10");
+			resp.setResponseDesc(argEx.getMessage());
 		} catch (Exception ex) {
 			resp.setResponseCode("04");
 			resp.setResponseDesc(ex.getMessage());
 		}
-		return ResponseEntity.accepted().body(resp);
+		return ResponseEntity.badRequest().body(resp);
 	}
 	
-	private void validateBook(Book book) throws Exception {
+	private void validateEditBook(Long id, Book book) throws IllegalArgumentException {
+		if (id == null) {
+			throw new IllegalArgumentException("id is required");
+		} else {
+			book.setId(id);
+		}
+		validateBook(book);
+	}
+	
+	private void validateBook(Book book) throws IllegalArgumentException {
 		if (StringUtils.isEmpty(book.getTitle())) {
-			throw new Exception("title is required");
+			throw new IllegalArgumentException("title is required");
 		} else if(StringUtils.isEmpty(book.getAuthor())) {
-			throw new Exception("author is required");
+			throw new IllegalArgumentException("author is required");
 		}
 	}
 	

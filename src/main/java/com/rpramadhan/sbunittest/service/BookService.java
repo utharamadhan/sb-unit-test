@@ -19,14 +19,14 @@ public class BookService implements IBookService {
 	
 	@Override
 	public Book findById(Long id) {
-		return null;
+		return BOOKS.containsKey(id) ? BOOKS.get(id) : null;
 	}
 
 	@Override
 	public void saveOrUpdate(Book book) throws Exception {
 		if (book.getId() != null && !BOOKS.containsKey(book.getId())) {
 			throw new Exception("not found");
-		} else {
+		} else if (book.getId() == null) {
 			book.setId(getLatestId());	
 		}
 		BOOKS.put(book.getId(), book);
